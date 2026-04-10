@@ -18,7 +18,7 @@ sudo pkill -f tailscaled || true
 sleep 1
 
 # Start fresh daemon and keep it running
-sudo nohup /opt/homebrew/bin/tailscaled > /tmp/tailscaled.log 2>&1 &
+sudo /opt/homebrew/bin/tailscaled > /tmp/tailscaled.log 2>&1 &
 sleep 5
 
 echo "=== Checking daemon status ==="
