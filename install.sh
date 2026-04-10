@@ -62,22 +62,14 @@ echo ""
 echo "Total time: ~30-45 minutes (mostly waiting for software installs)"
 echo ""
 
-read -p "Ready to proceed? (y/n): " CONFIRM
-
-if [[ ! "$CONFIRM" =~ ^[Yy]$ ]]; then
-  print_error "Setup cancelled"
-fi
-
-echo ""
-
-# Step 1: Create working directory
+# Create working directory
 print_step "Creating working directory..."
 mkdir -p "$WORK_DIR"
 cd "$WORK_DIR"
 print_success "Working in $WORK_DIR"
 echo ""
 
-# Step 2: Download scripts from GitHub
+# Download scripts from GitHub
 print_step "Downloading setup scripts from GitHub..."
 
 echo "Downloading bootstrap script..."
@@ -95,7 +87,7 @@ chmod +x verify-cluster.sh
 print_success "All scripts downloaded"
 echo ""
 
-# Step 3: Verify prerequisites
+# Verify prerequisites
 print_step "Checking prerequisites..."
 
 if [ "$(uname -s)" != "Darwin" ]; then
@@ -111,7 +103,7 @@ fi
 print_success "Git found"
 echo ""
 
-# Step 4: Bootstrap Studio + Minis
+# Bootstrap Studio + Minis
 print_step "Hardware setup (Studio + 3 Minis)..."
 echo ""
 echo "You'll need to be at each machine to run the bootstrap script."
@@ -141,7 +133,7 @@ fi
 
 echo ""
 
-# Step 5: Verify cluster is online
+# Verify cluster is online
 print_step "Verifying cluster is online..."
 
 bash "$WORK_DIR/verify-cluster.sh"
@@ -149,7 +141,7 @@ bash "$WORK_DIR/verify-cluster.sh"
 print_success "Cluster verified and online"
 echo ""
 
-# Step 6: Run Telegram setup
+# Run Telegram setup
 print_step "Setting up Telegram bot..."
 echo ""
 
@@ -157,7 +149,7 @@ bash "$WORK_DIR/telegram-setup-cli.sh"
 
 echo ""
 
-# Step 7: Final summary
+# Final summary
 print_header "Setup Complete!"
 
 echo "Your Gabriel cluster is now fully configured:"
