@@ -1,22 +1,38 @@
 #!/bin/bash
-set -e
+set -ex
 
-echo "Installing Homebrew..."
+echo "=== Installing Homebrew ==="
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+export PATH="/opt/homebrew/bin:$PATH"
 
-echo "Installing Tailscale..."
-/opt/homebrew/bin/brew install tailscale
+echo "=== Installing Tailscale ==="
+brew install tailscale
 
-echo "Verifying Tailscale installation..."
+echo "=== Verifying Tailscale ==="
 which tailscale
+tailscale version
 
-echo "Starting Tailscale daemon..."
-sudo /opt/homebrew/bin/tailscaled &
+echo "=== Starting Tailscale daemon ==="
+# Kill any existing tailscaled
+sudo pkill -f tailscaled || true
+sleep 1
+
+# Start fresh daemon and keep it running
+sudo nohup /opt/homebrew/bin/tailscaled > /tmp/tailscaled.log 2>&1 &
+sleep 5
+
+echo "=== Checking daemon status ==="
+ps aux | grep tailscaled | grep -v grep || echo "Daemon check failed"
+
+echo "=== Joining Tailscale network ==="
+sudo tailscale up --authkey=tskey-auth-kEAMGg1yeJ11CNTRL-NNJQcH2h1aSzBCDLPWJ8ZSDP9PsxjUGac
+
 sleep 3
 
-echo "Joining Tailscale network..."
-sudo /opt/homebrew/bin/tailscale up --authkey=tskey-auth-kEAMGg1yeJ11CNTRL-NNJQcH2h1aSzBCDLPWJ8ZSDP9PsxjUGac
-
-sleep 2
-echo "Done. You're on Tailscale."
-/opt/homebrew/bin/tailscale ip -4
+echo "=== Verifying connection ==="
+tailscale status
+echo ""
+echo "=== Your Tailscale IP ==="
+tailscale ip -4
+echo ""
+echo "Done!"
