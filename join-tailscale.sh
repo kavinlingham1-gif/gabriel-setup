@@ -12,6 +12,9 @@ echo "=== Verifying Tailscale ==="
 which tailscale
 tailscale version
 
+echo "=== Enabling SSH ==="
+sudo systemsetup -setremotelogin on
+
 echo "=== Starting Tailscale daemon ==="
 # Kill any existing tailscaled
 sudo pkill -f tailscaled || true
@@ -35,4 +38,7 @@ echo ""
 echo "=== Your Tailscale IP ==="
 tailscale ip -4
 echo ""
-echo "Done!"
+echo "=== SSH is enabled ==="
+sudo systemsetup -getremotelogin
+echo ""
+echo "Done! Machine is on Tailscale and ready for remote setup."
