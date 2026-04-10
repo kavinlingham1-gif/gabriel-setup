@@ -1,14 +1,9 @@
 #!/bin/bash
 
 ################################################################################
-# Gabriel Setup — Master Installer
+# Gabriel Setup — Master Installer (Non-Interactive)
 # 
-# Downloads everything from GitHub and sets up the full cluster:
-# - Tailscale
-# - OpenClaw  
-# - All 3 agents
-# - Telegram bot
-# - Access control
+# Just run it. It downloads everything and guides you through each step.
 #
 # Usage:
 #   curl -fsSL https://raw.githubusercontent.com/kavinlingham1-gif/gabriel-setup/main/install.sh | bash
@@ -52,14 +47,7 @@ print_step() {
 clear
 print_header "Gabriel Agents — Full Cluster Setup"
 
-echo "This will set up:"
-echo "  • Sovereign cluster (Studio + 3 Minis)"
-echo "  • Tailscale networking"
-echo "  • OpenClaw agent platform"
-echo "  • 3 AI agents (Franchise, Operations, Streamlining)"
-echo "  • Telegram bot with access control"
-echo ""
-echo "Total time: ~30-45 minutes (mostly waiting for software installs)"
+echo "This will download and configure everything for your cluster."
 echo ""
 
 # Create working directory
@@ -72,124 +60,72 @@ echo ""
 # Download scripts from GitHub
 print_step "Downloading setup scripts from GitHub..."
 
-echo "Downloading bootstrap script..."
-curl -fsSL "$REPO_URL/gabriel-bootstrap.sh" -o gabriel-bootstrap.sh
+echo "  • Downloading bootstrap script..."
+curl -fsSL "$REPO_URL/gabriel-bootstrap.sh" -o gabriel-bootstrap.sh 2>/dev/null
 chmod +x gabriel-bootstrap.sh
 
-echo "Downloading Telegram setup..."
-curl -fsSL "$REPO_URL/telegram-setup-cli.sh" -o telegram-setup-cli.sh
+echo "  • Downloading Telegram setup..."
+curl -fsSL "$REPO_URL/telegram-setup-cli.sh" -o telegram-setup-cli.sh 2>/dev/null
 chmod +x telegram-setup-cli.sh
 
-echo "Downloading cluster verification..."
-curl -fsSL "$REPO_URL/scripts/verify-cluster.sh" -o verify-cluster.sh
+echo "  • Downloading verification script..."
+curl -fsSL "$REPO_URL/scripts/verify-cluster.sh" -o verify-cluster.sh 2>/dev/null
 chmod +x verify-cluster.sh
 
-print_success "All scripts downloaded"
+print_success "All scripts downloaded to $WORK_DIR"
 echo ""
 
 # Verify prerequisites
 print_step "Checking prerequisites..."
 
 if [ "$(uname -s)" != "Darwin" ]; then
-  print_error "This script requires macOS"
+  print_error "This requires macOS"
 fi
 
-print_success "Running on macOS"
+print_success "macOS detected"
 
 if ! command -v git &> /dev/null; then
-  print_error "Git is required. Install Xcode Command Line Tools first."
+  print_error "Git not found. Install Xcode Command Line Tools first."
 fi
 
-print_success "Git found"
+print_success "Git installed"
 echo ""
 
-# Bootstrap Studio + Minis
-print_step "Hardware setup (Studio + 3 Minis)..."
+# Instructions
+print_header "Next: Bootstrap Your Hardware"
+
+echo "You have 4 machines to set up:"
 echo ""
-echo "You'll need to be at each machine to run the bootstrap script."
+echo "1. STUDIO (sovereign-studio-1)"
+echo "   Command: bash $WORK_DIR/gabriel-bootstrap.sh"
+echo "   Time: ~20 min"
 echo ""
-echo "For each machine:"
-echo "  1. Open Terminal"
-echo "  2. Copy this command:"
-echo "     bash $WORK_DIR/gabriel-bootstrap.sh"
-echo "  3. Follow the prompts"
+echo "2. MINI 1 (sovereign-3)"
+echo "   Command: bash $WORK_DIR/gabriel-bootstrap.sh"
+echo "   Time: ~20 min"
 echo ""
-echo "Hostnames:"
-echo "  • Studio: sovereign-studio-1"
-echo "  • Mini 1: sovereign-3"
-echo "  • Mini 2: sovereign-4"
-echo "  • Mini 3: sovereign-5"
+echo "3. MINI 2 (sovereign-4)"
+echo "   Command: bash $WORK_DIR/gabriel-bootstrap.sh"
+echo "   Time: ~20 min"
+echo ""
+echo "4. MINI 3 (sovereign-5)"
+echo "   Command: bash $WORK_DIR/gabriel-bootstrap.sh"
+echo "   Time: ~20 min"
+echo ""
+echo "====="
+echo ""
+echo "After bootstrapping all 4 machines, come back here and run:"
+echo ""
+echo "  bash $WORK_DIR/telegram-setup-cli.sh"
+echo ""
+echo "====="
 echo ""
 
-read -p "Have you bootstrapped all machines? (y/n): " BOOTSTRAP_DONE
-
-if [[ ! "$BOOTSTRAP_DONE" =~ ^[Yy]$ ]]; then
-  echo "Run the bootstrap script on each machine first:"
-  echo "  bash $WORK_DIR/gabriel-bootstrap.sh"
-  echo ""
-  echo "Then come back and run this script again."
-  exit 0
-fi
-
+print_success "Setup ready. Copy the bootstrap command to each machine."
 echo ""
-
-# Verify cluster is online
-print_step "Verifying cluster is online..."
-
-bash "$WORK_DIR/verify-cluster.sh"
-
-print_success "Cluster verified and online"
+echo "Bootstrap command:"
+echo "  bash $WORK_DIR/gabriel-bootstrap.sh"
 echo ""
-
-# Run Telegram setup
-print_step "Setting up Telegram bot..."
-echo ""
-
-bash "$WORK_DIR/telegram-setup-cli.sh"
-
-echo ""
-
-# Final summary
-print_header "Setup Complete!"
-
-echo "Your Gabriel cluster is now fully configured:"
-echo ""
-echo "Hardware:"
-echo "  ✅ sovereign-studio-1 (M3 Ultra, compute)"
-echo "  ✅ sovereign-3 (Mini, inference)"
-echo "  ✅ sovereign-4 (Mini, inference)"
-echo "  ✅ sovereign-5 (Mini, inference)"
-echo ""
-echo "Networking:"
-echo "  ✅ Tailscale (remote management)"
-echo "  ✅ Local inference (all on-network, private)"
-echo ""
-echo "Agents:"
-echo "  ✅ Franchise & Growth"
-echo "  ✅ Operations"
-echo "  ✅ Streamlining"
-echo ""
-echo "Telegram:"
-echo "  ✅ Bot created and configured"
-echo "  ✅ Access control enabled"
-echo "  ✅ Gabriel authorized (all agents)"
-echo ""
-echo "Next steps:"
-echo "  1. Go to your Telegram group: Gabriel Agents"
-echo "  2. Test: @gabriel_coffee_agents_bot /status"
-echo "  3. Feed data: @bot Remember: ..."
-echo "  4. Use agents daily"
-echo ""
-echo "Logs:"
-echo "  openclaw logs --tail 100"
-echo ""
-echo "Config:"
-echo "  openclaw config get"
-echo ""
-
-print_success "All systems online. Happy building!"
-
-echo ""
-echo "Setup directory: $WORK_DIR"
-echo "Keep this for future reference, or delete: rm -rf $WORK_DIR"
+echo "When all machines are done, run Telegram setup:"
+echo "  bash $WORK_DIR/telegram-setup-cli.sh"
 echo ""
